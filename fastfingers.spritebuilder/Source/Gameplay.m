@@ -9,7 +9,7 @@
 #import "Gameplay.h"
 #import "Obstacle.h"
 
-static const CGFloat scrollSpeedRate = 150.f;
+static const CGFloat scrollSpeedRate = 200.f;
 static const CGFloat yAccelSpeed = 10.f;
 static const CGFloat firstObstaclePosition = 280.f;
 static const CGFloat distanceBetweenObstacles = 200.f;
@@ -27,8 +27,6 @@ static const CGFloat distanceBetweenObstacles = 200.f;
    CCNode *_cloud3;
    NSArray *_clouds;
     NSMutableArray *_obstacles;
-    CCButton *_restartButton;
-   CCButton *_shareButton;
     BOOL _gameOver;
     CGFloat _scrollSpeed;
     CGFloat _elapsedTime;
@@ -38,6 +36,7 @@ static const CGFloat distanceBetweenObstacles = 200.f;
     CGFloat _swiped;
     CGFloat _newHeroPosition;
     CCNode *_gameOverBox;
+   CCNode *_banner;
     CCLabelTTF *_highScoreValue;
     CCLabelTTF *_scoreValue;
    AVAudioPlayer *clickSound;
@@ -132,41 +131,56 @@ static const CGFloat distanceBetweenObstacles = 200.f;
    
    [clickSound setDelegate:self];
    
+   _gameOver = TRUE;
+   _banner.visible = TRUE;
 }
 
 -(void)screenWasSwipedUp
 {
-    if(_hero.position.y < 420)
+   if (_gameOver && _scrollSpeed != 0) {
+      _gameOver = FALSE;
+      [_banner runAction:[CCActionFadeOut actionWithDuration:1.0]];
+   }
+   else {
+    if(_hero.position.y < 340)
     {
     if(_hero.position.y == 90 ||
        _hero.position.y == 170 ||
        _hero.position.y == 250 ||
-       _hero.position.y == 330 ||
-       _hero.position.y == 410)
+       _hero.position.y == 330)
+//       _hero.position.y == 410)
     {
     _swiped = 1.0f;
     _newHeroPosition = _hero.position.y;
+    }
     }
     }
 }
 
 -(void)screenWasSwipedDown
 {
+   if (_gameOver && _scrollSpeed != 0) {
+      _gameOver = FALSE;
+      [_banner runAction:[CCActionFadeOut actionWithDuration:1.0]];
+   }
+   else {
     if(_hero.position.y == 90 ||
        _hero.position.y == 170 ||
        _hero.position.y == 250 ||
-       _hero.position.y == 330 ||
-       _hero.position.y == 410)
+       _hero.position.y == 330)
+//       _hero.position.y == 410)
     {
         _swiped = -1.0f;
         _newHeroPosition = _hero.position.y;
     }
+   }
 }
 
 -(void)screenTapped
 {
-    if (!_gameOver) {
-//       [self launchBullet];
+    if (_gameOver && _scrollSpeed != 0) {
+          _gameOver = FALSE;
+      [_banner runAction:[CCActionFadeOut actionWithDuration:1.0]];
     }
 }
 
@@ -248,32 +262,19 @@ static const CGFloat distanceBetweenObstacles = 200.f;
          [self spawnNewObstacle];
       }
    }
-   else
+   else if (_gameOver && _scrollSpeed == 0)
    {
-      if(_gameOverBox.position.y < 190)
-      {
-         _gameOverBox.position = ccp(_gameOverBox.position.x, _gameOverBox.position.y + 5);
-      }
-      if(_highScoreValue.position.y < 150)
-      {
-         _highScoreValue.position = ccp(_highScoreValue.position.x, _highScoreValue.position.y + 5);
-      }
-      if(_scoreValue.position.y < 180)
-      {
-         _scoreValue.position = ccp(_scoreValue.position.x, _scoreValue.position.y + 5);
-      }
-      else
-      {
          _elapsedTime += delta;
-         if(_localCounter <= _points && _elapsedTime > 0.5)
+         if(_localCounter <= _points && _elapsedTime > 2)
          {
-            _restartButton.visible = TRUE;
-            _shareButton.visible = TRUE;
+            _physicsNode.visible = FALSE;
+            _gameOverBox.visible = TRUE;
+            [_gameOverBox runAction:[CCActionFadeIn  actionWithDuration:0.5]];
+
             _localCounter++;
             _scoreValue.string = [NSString stringWithFormat:@"%ld", (long)_localCounter-1];
+            
          }
-      }
-      
    }
 }
 
@@ -298,7 +299,7 @@ static const CGFloat distanceBetweenObstacles = 200.f;
 
 
 -(BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair hero:(CCNode *)hero level:(CCNode *)level {
-_hero.effect = [CCEffectPixellate effectWithBlockSize: 5];
+   _hero.effect = [CCEffectPixellate effectWithBlockSize: 5];
 //    [self heroRemoved:hero];
     [self gameOver];
     return TRUE;
@@ -311,14 +312,14 @@ _hero.effect = [CCEffectPixellate effectWithBlockSize: 5];
     return TRUE;
 }
 
-- (void)restart {
+- (void)restart
+{
    [clickSound play];
 //   [[CCDirector sharedDirector] setAnimationInterval:1.0/60];
-   CCScene *scene = [CCBReader loadAsScene:@"MainScene"];
+   CCScene *scene = [CCBReader loadAsScene:@"Gameplay"];
 //   CCScene *scene = [CCBReader loadAsScene:@"MainScene" owner:0];
-   [[CCDirector sharedDirector] replaceScene:scene];
-//   [[CCDirector sharedDirector] replaceScene:[CCTransition transitionWithDuration:0 scene:scene]];
-
+//   [[CCDirector sharedDirector] replaceScene:scene];
+   [[CCDirector sharedDirector] replaceScene:scene withTransition:[CCTransition transitionFadeWithDuration:1.0]];
 }
 
 -(void)onExit
@@ -337,9 +338,8 @@ _hero.effect = [CCEffectPixellate effectWithBlockSize: 5];
     if (!_gameOver) {
         _scrollSpeed = 0.f;
         _gameOver = TRUE;
-        _gameOverBox.visible = TRUE;
-        _highScoreValue.visible = TRUE;
-        _scoreValue.visible = TRUE;
+//        _highScoreValue.visible = TRUE;
+//        _scoreValue.visible = TRUE;
         [_hero stopAllActions];
        
 //        CCActionMoveBy *moveBy = [CCActionMoveBy actionWithDuration:0.5f position:ccp(0, 163)];
@@ -382,8 +382,8 @@ _hero.effect = [CCEffectPixellate effectWithBlockSize: 5];
 
 -(void)shareImage{
    [clickSound play];
-   NSString *message = [NSString stringWithFormat:@"OMG!!! I scored %d", _points];
-   message = [message stringByAppendingString:@" points in Destroy Flappy."];
+   NSString *message = [NSString stringWithFormat:@"Hey!!! I scored %d", _points];
+   message = [message stringByAppendingString:@" points in Fast Fingers."];
    
    UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:[NSArray arrayWithObjects:message,_image, nil] applicationActivities:nil];
    activityVC.excludedActivityTypes = @[ UIActivityTypeAssignToContact];

@@ -18,7 +18,7 @@ static const CGFloat pipeDistance = 50.f;
 //static const CGFloat scrollSpeed = 1.f;
 
 - (void)setupRandomPosition {
-    _random = arc4random() % 4;
+    _random = arc4random() % 3;
     switch(_random)
     {
         case 0:
@@ -33,10 +33,10 @@ static const CGFloat pipeDistance = 50.f;
             _yPosition = 370; // hero position 170
 //          _yPosition = 210;
             break;
-        case 3:
-            _yPosition = 450; // hero position 90
-//          _yPosition = 210;
-            break;
+//        case 3:
+//            _yPosition = 450; // hero position 90
+////          _yPosition = 210;
+//            break;
         default:
             break;
     }
