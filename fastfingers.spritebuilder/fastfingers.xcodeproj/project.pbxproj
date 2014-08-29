@@ -11,6 +11,8 @@
 		3A0D911619A58FD200B930EA /* Obstacle.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A0D911519A58FD200B930EA /* Obstacle.m */; };
 		3AB72AB519A59783004CBD9E /* click.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3AB72AB419A59783004CBD9E /* click.wav */; };
 		3AB72AB919A6AB89004CBD9E /* Goal.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AB72AB819A6AB89004CBD9E /* Goal.m */; };
+		3AB72AC119AF4109004CBD9E /* soothing.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3AB72AC019AF4109004CBD9E /* soothing.wav */; };
+		3AB72AC319B00A2C004CBD9E /* game_over.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3AB72AC219B00A2C004CBD9E /* game_over.wav */; };
 		8392007A18EE8E3300B6C429 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8392007918EE8E3300B6C429 /* GLKit.framework */; };
 		B71F5911188484E7003F4D28 /* iPad-old.png in Resources */ = {isa = PBXBuildFile; fileRef = B71F5907188484E7003F4D28 /* iPad-old.png */; };
 		B71F5912188484E7003F4D28 /* iPad-old@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B71F5908188484E7003F4D28 /* iPad-old@2x.png */; };
@@ -67,6 +69,8 @@
 		3AB72AB419A59783004CBD9E /* click.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = click.wav; sourceTree = "<group>"; };
 		3AB72AB719A6AB89004CBD9E /* Goal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Goal.h; path = Source/Goal.h; sourceTree = "<group>"; };
 		3AB72AB819A6AB89004CBD9E /* Goal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Goal.m; path = Source/Goal.m; sourceTree = "<group>"; };
+		3AB72AC019AF4109004CBD9E /* soothing.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = soothing.wav; sourceTree = "<group>"; };
+		3AB72AC219B00A2C004CBD9E /* game_over.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = game_over.wav; sourceTree = "<group>"; };
 		8392007918EE8E3300B6C429 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		B71F5907188484E7003F4D28 /* iPad-old.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "iPad-old.png"; path = "Icons/iPad-old.png"; sourceTree = "<group>"; };
 		B71F5908188484E7003F4D28 /* iPad-old@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "iPad-old@2x.png"; path = "Icons/iPad-old@2x.png"; sourceTree = "<group>"; };
@@ -220,6 +224,8 @@
 		B77F1B4617B978D7009739AE /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				3AB72AC219B00A2C004CBD9E /* game_over.wav */,
+				3AB72AC019AF4109004CBD9E /* soothing.wav */,
 				3AB72AB419A59783004CBD9E /* click.wav */,
 				B73789911807667A0076A88C /* Icons */,
 				B737893A180761570076A88C /* Published-iOS */,
@@ -318,6 +324,7 @@
 			files = (
 				B71F5919188484E7003F4D28 /* Settings.png in Resources */,
 				B7378978180762440076A88C /* Default@2x.png in Resources */,
+				3AB72AC319B00A2C004CBD9E /* game_over.wav in Resources */,
 				B71F5914188484E7003F4D28 /* iPad@2x.png in Resources */,
 				B71F5913188484E7003F4D28 /* iPad.png in Resources */,
 				B71F5912188484E7003F4D28 /* iPad-old@2x.png in Resources */,
@@ -331,6 +338,7 @@
 				B7378975180762440076A88C /* Default-568h@2x.png in Resources */,
 				B71F5918188484E7003F4D28 /* iPhone@2x.png in Resources */,
 				B7378977180762440076A88C /* Default.png in Resources */,
+				3AB72AC119AF4109004CBD9E /* soothing.wav in Resources */,
 				B71F5911188484E7003F4D28 /* iPad-old.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

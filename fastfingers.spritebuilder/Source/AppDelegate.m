@@ -29,6 +29,9 @@
 #import "CCBuilderReader.h"
 
 @implementation AppController
+{
+   AVAudioPlayer *playSound;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -53,7 +56,33 @@
     //[cocos2dSetup setObject:kEAGLColorFormatRGB565 forKey:CCConfigPixelFormat];
     
     [self setupCocos2dWithOptions:cocos2dSetup];
-    
+   
+   // The AV Audio Player needs a URL to the file that will be played to be specified.
+   // So, we're going to set the audio file's path and then convert it to a URL.
+   // play sound
+   NSString *audioFilePath1 = [[NSBundle mainBundle] pathForResource:@"soothing" ofType:@"wav"];
+   NSURL *pathAsURL1 = [[NSURL alloc] initFileURLWithPath:audioFilePath1];
+   NSError *error1;
+   playSound = [[AVAudioPlayer alloc] initWithContentsOfURL:pathAsURL1 error:&error1];
+   playSound.numberOfLoops = -1;
+   playSound.volume = 0.5;
+   
+   // Check out what's wrong in case that the player doesn't init.
+   if (error1) {
+      NSLog(@"%@", [error1 localizedDescription]);
+   }
+   else{
+      // In this example we'll pre-load the audio into the buffer. You may avoid it if you want
+      // as it's not always possible to pre-load the audio.
+      if(playSound.playing == FALSE)
+      {
+         [playSound prepareToPlay];
+         [playSound play];
+      }
+   }
+   
+//   [playSound setDelegate:self];
+   
     return YES;
 }
 

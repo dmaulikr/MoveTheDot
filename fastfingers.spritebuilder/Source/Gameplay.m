@@ -14,6 +14,13 @@ static const CGFloat yAccelSpeed = 10.f;
 static const CGFloat firstObstaclePosition = 280.f;
 static const CGFloat distanceBetweenObstacles = 200.f;
 
+// fixing the drawing order. forcing the ground to be drawn above the pipes.
+typedef NS_ENUM(NSInteger, DrawingOrder) {
+   DrawingOrderPipes,
+   DrawingOrderGround,
+   DrawingOrdeHero
+};
+
 @implementation Gameplay
 {
     CCPhysicsNode *_physicsNode;
@@ -36,10 +43,11 @@ static const CGFloat distanceBetweenObstacles = 200.f;
     CGFloat _swiped;
     CGFloat _newHeroPosition;
     CCNode *_gameOverBox;
+   CCNode *_scoreLabelBox;
    CCNode *_banner;
     CCLabelTTF *_highScoreValue;
     CCLabelTTF *_scoreValue;
-   AVAudioPlayer *clickSound;
+   AVAudioPlayer *clickSound, *gameOverSound;
    UIImage *_image;
 
 }
@@ -65,6 +73,7 @@ static const CGFloat distanceBetweenObstacles = 200.f;
     for (CCNode *ground in _grounds) {
         // set collision txpe
         ground.physicsBody.collisionType = @"level";
+       ground.zOrder = DrawingOrderGround;
     }
    for (CCNode *cloud in _clouds) {
       // set collision txpe
@@ -72,6 +81,8 @@ static const CGFloat distanceBetweenObstacles = 200.f;
    }
     // set collision type
     _hero.physicsBody.collisionType = @"hero";
+   _hero.zOrder = DrawingOrdeHero;
+
    
     _scrollSpeed = scrollSpeedRate;
     
@@ -113,11 +124,31 @@ static const CGFloat distanceBetweenObstacles = 200.f;
    
    // The AV Audio Player needs a URL to the file that will be played to be specified.
    // So, we're going to set the audio file's path and then convert it to a URL.
+   // game over sound
+   NSString *audioFilePath1 = [[NSBundle mainBundle] pathForResource:@"game_over" ofType:@"wav"];
+   NSURL *pathAsURL1 = [[NSURL alloc] initFileURLWithPath:audioFilePath1];
+   NSError *error1;
+   gameOverSound = [[AVAudioPlayer alloc] initWithContentsOfURL:pathAsURL1 error:&error1];
+   gameOverSound.volume = 0.5;
+
+   // Check out what's wrong in case that the player doesn't init.
+   if (error1) {
+      NSLog(@"%@", [error1 localizedDescription]);
+   }
+   else{
+      // In this example we'll pre-load the audio into the buffer. You may avoid it if you want
+      // as it's not always possible to pre-load the audio.
+      [gameOverSound prepareToPlay];
+   }
+   
+   [gameOverSound setDelegate:self];
+   
    // click sound
    NSString *audioFilePath2 = [[NSBundle mainBundle] pathForResource:@"click" ofType:@"wav"];
    NSURL *pathAsURL2 = [[NSURL alloc] initFileURLWithPath:audioFilePath2];
    NSError *error2;
    clickSound = [[AVAudioPlayer alloc] initWithContentsOfURL:pathAsURL2 error:&error2];
+   clickSound.volume = 0.5;
    
    // Check out what's wrong in case that the player doesn't init.
    if (error2) {
@@ -130,9 +161,10 @@ static const CGFloat distanceBetweenObstacles = 200.f;
    }
    
    [clickSound setDelegate:self];
-   
+
    _gameOver = TRUE;
    _banner.visible = TRUE;
+
 }
 
 -(void)screenWasSwipedUp
@@ -267,7 +299,10 @@ static const CGFloat distanceBetweenObstacles = 200.f;
          _elapsedTime += delta;
          if(_localCounter <= _points && _elapsedTime > 2)
          {
+//            [playSound stop];
             _physicsNode.visible = FALSE;
+            _scoreLabel.visible = FALSE;
+            _scoreLabelBox.visible = FALSE;
             _gameOverBox.visible = TRUE;
             [_gameOverBox runAction:[CCActionFadeIn  actionWithDuration:0.5]];
 
@@ -295,11 +330,15 @@ static const CGFloat distanceBetweenObstacles = 200.f;
     [obstacle setupRandomPosition];
     [_physicsNode addChild:obstacle];
     [_obstacles addObject:obstacle];
+   // fixing drawing order. drawing grounds in front of pipes.
+   obstacle.zOrder = DrawingOrderPipes;
 }
 
 
 -(BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair hero:(CCNode *)hero level:(CCNode *)level {
-   _hero.effect = [CCEffectPixellate effectWithBlockSize: 5];
+   [gameOverSound play];
+   _hero.effect = [CCEffectPixellate effectWithBlockSize: 4];
+//   _hero.effect = [CCEffectBrightness effectWithBrightness:1];
 //    [self heroRemoved:hero];
     [self gameOver];
     return TRUE;
@@ -315,10 +354,7 @@ static const CGFloat distanceBetweenObstacles = 200.f;
 - (void)restart
 {
    [clickSound play];
-//   [[CCDirector sharedDirector] setAnimationInterval:1.0/60];
    CCScene *scene = [CCBReader loadAsScene:@"Gameplay"];
-//   CCScene *scene = [CCBReader loadAsScene:@"MainScene" owner:0];
-//   [[CCDirector sharedDirector] replaceScene:scene];
    [[CCDirector sharedDirector] replaceScene:scene withTransition:[CCTransition transitionFadeWithDuration:1.0]];
 }
 
@@ -329,6 +365,8 @@ static const CGFloat distanceBetweenObstacles = 200.f;
     [self removeAllChildrenWithCleanup:YES];
    clickSound.delegate = nil;
    clickSound = nil;
+   gameOverSound.delegate = nil;
+   gameOverSound = nil;
     [super onExit];
 }
 
