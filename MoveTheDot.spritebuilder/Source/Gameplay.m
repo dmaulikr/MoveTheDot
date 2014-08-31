@@ -422,7 +422,7 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
 -(void)shareImage{
    [clickSound play];
    NSString *message = [NSString stringWithFormat:@"Hey!!! I scored %ld", (long)_points];
-   message = [message stringByAppendingString:@" points in Fast Fingers."];
+   message = [message stringByAppendingString:@" points in Move The Dot."];
    
    UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:[NSArray arrayWithObjects:message,_image, nil] applicationActivities:nil];
    activityVC.excludedActivityTypes = @[ UIActivityTypeAssignToContact];
