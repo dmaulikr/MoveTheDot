@@ -394,11 +394,11 @@
 						</array>
 						<array>
 							<real>0.0</real>
-							<real>800</real>
+							<real>900</real>
 						</array>
 						<array>
 							<real>20</real>
-							<real>800</real>
+							<real>900</real>
 						</array>
 						<array>
 							<real>20</real>
@@ -414,11 +414,11 @@
 							</array>
 							<array>
 								<real>20</real>
-								<real>800</real>
+								<real>900</real>
 							</array>
 							<array>
 								<real>0.0</real>
-								<real>800</real>
+								<real>900</real>
 							</array>
 							<array>
 								<real>0.0</real>
@@ -489,6 +489,8 @@
 						</array>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 		</array>
 		<key>customClass</key>
