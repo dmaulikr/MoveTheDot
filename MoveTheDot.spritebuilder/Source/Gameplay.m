@@ -161,6 +161,7 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    }
    
    [clickSound setDelegate:self];
+   [self authenticateLocalPlayer];
 
    _gameOver = TRUE;
    _banner.visible = TRUE;
@@ -393,8 +394,8 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
         {
         
             [[NSUserDefaults standardUserDefaults] setInteger: _points forKey: @"highScore"];
-        
-            // To read it back:
+
+           [self reportScore];
         
         }
         _highScore = [[NSUserDefaults standardUserDefaults] integerForKey:@"highScore"] ;
@@ -427,6 +428,73 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    activityVC.excludedActivityTypes = @[ UIActivityTypeAssignToContact];
    [[CCDirector sharedDirector] presentViewController:activityVC animated:YES completion:nil];
 
+}
+
+#pragma mark GameCenter
+-(void)authenticateLocalPlayer{
+   GKLocalPlayer *localPlayer = [GKLocalPlayer localPlayer];
+   
+   localPlayer.authenticateHandler = ^(UIViewController *viewController, NSError *error){
+      if (viewController != nil) {
+         [[CCDirector sharedDirector] presentViewController:viewController animated:YES completion:nil];
+      }
+      else{
+         if ([GKLocalPlayer localPlayer].authenticated) {
+            _gameCenterEnabled = YES;
+            
+            // Get the default leaderboard identifier.
+            [[GKLocalPlayer localPlayer] loadDefaultLeaderboardIdentifierWithCompletionHandler:^(NSString *leaderboardIdentifier, NSError *error) {
+               
+               if (error != nil) {
+                  NSLog(@"%@", [error localizedDescription]);
+               }
+               else{
+                  _leaderboardIdentifier = leaderboardIdentifier;
+               }
+            }];
+         }
+         
+         else{
+            _gameCenterEnabled = NO;
+         }
+      }
+   };
+}
+-(void)reportScore{
+   GKScore *score = [[GKScore alloc] initWithLeaderboardIdentifier:@"2"];
+   score.value = _points;
+   
+   [GKScore reportScores:@[score] withCompletionHandler:^(NSError *error) {
+      if (error != nil) {
+         NSLog(@"%@", [error localizedDescription]);
+      }
+   }];
+}
+
+-(void)showLeaderboardAndAchievements:(BOOL)shouldShowLeaderboard{
+   GKGameCenterViewController *gcViewController = [[GKGameCenterViewController alloc] init];
+   
+   gcViewController.gameCenterDelegate = self;
+   
+   if (shouldShowLeaderboard) {
+      gcViewController.viewState = GKGameCenterViewControllerStateLeaderboards;
+      gcViewController.leaderboardIdentifier = _leaderboardIdentifier;
+   }
+   else{
+      gcViewController.viewState = GKGameCenterViewControllerStateAchievements;
+   }
+   
+   [[CCDirector sharedDirector] presentViewController:gcViewController animated:YES completion:nil];
+}
+
+-(void)gameCenterViewControllerDidFinish:(GKGameCenterViewController *)gameCenterViewController
+{
+   [gameCenterViewController dismissViewControllerAnimated:YES completion:nil];
+}
+
+-(void)showLeaderboard{
+   [clickSound play];
+   [self showLeaderboardAndAchievements:YES];
 }
 
 @end

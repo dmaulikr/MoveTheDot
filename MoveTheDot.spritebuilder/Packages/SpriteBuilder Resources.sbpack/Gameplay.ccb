@@ -2494,7 +2494,7 @@
 								<string>Block</string>
 								<key>value</key>
 								<array>
-									<string></string>
+									<string>showLeaderboard</string>
 									<integer>1</integer>
 								</array>
 							</dict>
@@ -2969,8 +2969,6 @@
 								</array>
 							</dict>
 						</array>
-						<key>selected</key>
-						<true/>
 					</dict>
 					<dict>
 						<key>UUID</key>
