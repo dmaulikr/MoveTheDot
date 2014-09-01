@@ -49,7 +49,10 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
     CCLabelTTF *_scoreValue;
    AVAudioPlayer *clickSound, *gameOverSound;
    UIImage *_image;
-
+   GADBannerView *_bannerView;
+   GADInterstitial *interstitial;
+   BOOL areAdsRemoved;
+   
 }
 
 // is called when CCB file has completed loading
@@ -122,6 +125,27 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
     
     _highScore = [[NSUserDefaults standardUserDefaults] integerForKey:@"highScore"] ;
    
+   [self cycleInterstitial]; // Prepare our interstitial for after the game so that we can be certain its ready to present
+   
+   // Initialize the banner at the bottom of the screen.
+   CGPoint origin = CGPointMake(0.0,
+                                [CCDirector sharedDirector].view.frame.size.height -
+                                CGSizeFromGADAdSize(kGADAdSizeBanner).height);
+   _bannerView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeSmartBannerPortrait origin:origin];
+   
+   // Specify the ad unit ID.
+   _bannerView.adUnitID = @"ca-app-pub-3129568560891761/2856875137";
+   
+   // Let the runtime know which UIViewController to restore after taking
+   // the user wherever the ad goes and add it to the view hierarchy.
+   _bannerView.rootViewController = [CCDirector sharedDirector];
+   [[[CCDirector sharedDirector]view]addSubview:_bannerView];
+   // Initiate a generic request to load it with an ad.
+   [_bannerView loadRequest:[GADRequest request]];
+   _bannerView.delegate = self;
+   _bannerView.hidden = NO;
+   
+
    // The AV Audio Player needs a URL to the file that will be played to be specified.
    // So, we're going to set the audio file's path and then convert it to a URL.
    // game over sound
@@ -161,7 +185,7 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    }
    
    [clickSound setDelegate:self];
-   [self authenticateLocalPlayer];
+//   [self authenticateLocalPlayer];
 
    _gameOver = TRUE;
    _banner.visible = TRUE;
@@ -355,8 +379,7 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
 - (void)restart
 {
    [clickSound play];
-   CCScene *scene = [CCBReader loadAsScene:@"Gameplay"];
-   [[CCDirector sharedDirector] replaceScene:scene withTransition:[CCTransition transitionFadeWithDuration:1.0]];
+   [self presentInterlude];
 }
 
 -(void)onExit
@@ -364,6 +387,9 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
     [self stopAllActions];
     [self unscheduleAllSelectors];
     [self removeAllChildrenWithCleanup:YES];
+   [_bannerView removeFromSuperview];
+   interstitial.delegate = nil;
+   interstitial = nil;
    clickSound.delegate = nil;
    clickSound = nil;
    gameOverSound.delegate = nil;
@@ -431,35 +457,6 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
 }
 
 #pragma mark GameCenter
--(void)authenticateLocalPlayer{
-   GKLocalPlayer *localPlayer = [GKLocalPlayer localPlayer];
-   
-   localPlayer.authenticateHandler = ^(UIViewController *viewController, NSError *error){
-      if (viewController != nil) {
-         [[CCDirector sharedDirector] presentViewController:viewController animated:YES completion:nil];
-      }
-      else{
-         if ([GKLocalPlayer localPlayer].authenticated) {
-            _gameCenterEnabled = YES;
-            
-            // Get the default leaderboard identifier.
-            [[GKLocalPlayer localPlayer] loadDefaultLeaderboardIdentifierWithCompletionHandler:^(NSString *leaderboardIdentifier, NSError *error) {
-               
-               if (error != nil) {
-                  NSLog(@"%@", [error localizedDescription]);
-               }
-               else{
-                  _leaderboardIdentifier = leaderboardIdentifier;
-               }
-            }];
-         }
-         
-         else{
-            _gameCenterEnabled = NO;
-         }
-      }
-   };
-}
 -(void)reportScore{
    GKScore *score = [[GKScore alloc] initWithLeaderboardIdentifier:@"2"];
    score.value = _points;
@@ -496,5 +493,57 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    [clickSound play];
    [self showLeaderboardAndAchievements:YES];
 }
+
+#pragma mark GADBannerViewDelegate implementation
+
+// We've received an ad successfully.
+- (void)adViewDidReceiveAd:(GADBannerView *)adView {
+   NSLog(@"Received ad successfully");
+}
+
+- (void)adView:(GADBannerView *)view didFailToReceiveAdWithError:(GADRequestError *)error {
+   NSLog(@"Failed to receive ad with error: %@", [error localizedFailureReason]);
+}
+
+#pragma mark -
+#pragma mark Interstitial Management
+
+- (void)cycleInterstitial
+{
+   // Clean up the old interstitial...
+   interstitial.delegate = nil;
+   interstitial = nil;
+   // GAD
+   interstitial = [[GADInterstitial alloc] init];
+   interstitial.adUnitID = @"ca-app-pub-3129568560891761/4333608339";
+   [interstitial loadRequest:[GADRequest request]];
+   interstitial.delegate = self;
+}
+
+- (void)presentInterlude
+{
+   // If the interstitial managed to load, then we'll present it now.
+   if (interstitial.isReady) {
+      [interstitial presentFromRootViewController:[CCDirector sharedDirector]];
+   }
+   _bannerView.hidden = YES;
+   CCScene *scene = [CCBReader loadAsScene:@"Gameplay"];
+   [[CCDirector sharedDirector] replaceScene:scene withTransition:[CCTransition transitionFadeWithDuration:1.0]];
+}
+
+#pragma mark ADInterstitialViewDelegate methods
+
+// This method will be invoked when an error has occurred attempting to get advertisement content.
+// The ADError enum lists the possible error codes.
+-(void)interstitial:(GADInterstitial *)ad didFailToReceiveAdWithError:(GADRequestError *)error
+{
+   [self cycleInterstitial];
+}
+
+-(void)interstitialDidDismissScreen:(GADInterstitial *)ad
+{
+   [self cycleInterstitial];
+}
+
 
 @end

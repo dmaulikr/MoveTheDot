@@ -9,9 +9,11 @@
 #import "CCNode.h"
 #import <AVFoundation/AVFoundation.h>
 #import <GameKit/GameKit.h>
+#import "GADInterstitial.h"
+#import "GADBannerView.h"
 
 
-@interface Gameplay : CCNode <CCPhysicsCollisionDelegate, UIGestureRecognizerDelegate, AVAudioPlayerDelegate,GKGameCenterControllerDelegate>
+@interface Gameplay : CCNode <CCPhysicsCollisionDelegate, UIGestureRecognizerDelegate, AVAudioPlayerDelegate,GKGameCenterControllerDelegate,GADBannerViewDelegate,GADInterstitialDelegate>
 {
 }
 
@@ -25,8 +27,17 @@
 
 -(void)screenWasSwipedUp;
 -(void)screenWasSwipedDown;
--(void)authenticateLocalPlayer;
+// game center
 -(void)reportScore;
 -(void)showLeaderboardAndAchievements:(BOOL)shouldShowLeaderboard;
+// iap
+-(void)purchase;
+-(void)restore;
+-(void)tapsRemoveAdsButton;
+// Interstitials
+-(void)cycleInterstitial;
+-(void)presentInterlude;
+
+
 
 @end

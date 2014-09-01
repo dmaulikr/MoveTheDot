@@ -27,11 +27,14 @@
 
 #import "AppDelegate.h"
 #import "CCBuilderReader.h"
+#import "Gameplay.h"
 
 @implementation AppController
 {
    AVAudioPlayer *playSound;
 }
+
+@synthesize gamePlay;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -82,6 +85,33 @@
    }
    
 //   [playSound setDelegate:self];
+   GKLocalPlayer *localPlayer = [GKLocalPlayer localPlayer];
+   
+   localPlayer.authenticateHandler = ^(UIViewController *viewController, NSError *error){
+      if (viewController != nil) {
+         [[CCDirector sharedDirector] presentViewController:viewController animated:YES completion:nil];
+      }
+      else{
+         if ([GKLocalPlayer localPlayer].authenticated) {
+            gamePlay.gameCenterEnabled = YES;
+            
+            // Get the default leaderboard identifier.
+            [[GKLocalPlayer localPlayer] loadDefaultLeaderboardIdentifierWithCompletionHandler:^(NSString *leaderboardIdentifier, NSError *error) {
+               
+               if (error != nil) {
+                  NSLog(@"%@", [error localizedDescription]);
+               }
+               else{
+                  gamePlay.leaderboardIdentifier = leaderboardIdentifier;
+               }
+            }];
+         }
+         
+         else{
+            gamePlay.gameCenterEnabled = NO;
+         }
+      }
+   };
    
     return YES;
 }

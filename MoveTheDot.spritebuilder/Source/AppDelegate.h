@@ -26,8 +26,12 @@
 #import <UIKit/UIKit.h>
 #import "cocos2d.h"
 
+@class Gameplay;
+
 @interface AppController : CCAppDelegate
 {
+   Gameplay *gamePlay;
 }
+@property (nonatomic, retain) IBOutlet Gameplay *gamePlay;
 
 @end
