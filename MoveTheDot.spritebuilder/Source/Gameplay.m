@@ -14,6 +14,8 @@ static const CGFloat yAccelSpeed = 10.f;
 static const CGFloat firstObstaclePosition = 280.f;
 static const CGFloat distanceBetweenObstacles = 200.f;
 
+#define kRemoveAdsProductIdentifier @"com.bakwasgames.movethedot.removeads"
+
 // fixing the drawing order. forcing the ground to be drawn above the pipes.
 typedef NS_ENUM(NSInteger, DrawingOrder) {
    DrawingOrderPipes,
@@ -51,17 +53,14 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    UIImage *_image;
    GADBannerView *_bannerView;
    GADInterstitial *interstitial;
-   BOOL areAdsRemoved;
-   
+   CCButton *_removeAdsButton;
+   UIActivityIndicatorView *spinner;
 }
 
 // is called when CCB file has completed loading
 - (void)didLoadFromCCB {
     // tell this scene to accept touches
     self.userInteractionEnabled = TRUE;
-    
-//    CCScene *level = [CCBReader loadAsScene:@"Levels/Level1"];
-//    [_levelNode addChild:level];
     
     _physicsNode.collisionDelegate = self;
     
@@ -124,9 +123,14 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
     _newHeroPosition = _hero.position.y;
     
     _highScore = [[NSUserDefaults standardUserDefaults] integerForKey:@"highScore"] ;
+
+   // remove ads
+   _areAdsRemoved = [[NSUserDefaults standardUserDefaults] boolForKey:@"areAdsRemoved"];
    
+   if(!_areAdsRemoved)
+   {
    [self cycleInterstitial]; // Prepare our interstitial for after the game so that we can be certain its ready to present
-   
+      
    // Initialize the banner at the bottom of the screen.
    CGPoint origin = CGPointMake(0.0,
                                 [CCDirector sharedDirector].view.frame.size.height -
@@ -144,7 +148,7 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    [_bannerView loadRequest:[GADRequest request]];
    _bannerView.delegate = self;
    _bannerView.hidden = NO;
-   
+   }
 
    // The AV Audio Player needs a URL to the file that will be played to be specified.
    // So, we're going to set the audio file's path and then convert it to a URL.
@@ -187,9 +191,22 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    [clickSound setDelegate:self];
 //   [self authenticateLocalPlayer];
 
+    spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+   [spinner setCenter:CGPointMake([CCDirector sharedDirector].view.frame.size.width/2.0, [CCDirector sharedDirector].view.frame.size.height/2.0)]; // I do this because I'm in landscape mode
+   [[[CCDirector sharedDirector]view]addSubview:spinner];
+   
    _gameOver = TRUE;
    _banner.visible = TRUE;
 
+   if(!_areAdsRemoved){
+      _removeAdsButton.visible = TRUE;
+      _removeAdsButton.enabled = TRUE;
+   }
+   else{
+      _removeAdsButton.visible = FALSE;
+      _removeAdsButton.enabled = FALSE;
+      _bannerView.hidden = TRUE;
+   }
 }
 
 -(void)screenWasSwipedUp
@@ -243,17 +260,6 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
 
 -(void)screenWasSwipedRight
 {
-   if (!_gameOver) {
-//      if(_missileCount > 0)
-//      {
-//         [self launchMissile];
-//         _missileCount--;
-//         _missileLabel.string = [NSString stringWithFormat:@"%ld", (long)_missileCount];
-//      }
-//      else{
-//         [errorSound play];
-//      }
-   }
 }
 
 
@@ -324,7 +330,6 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
          _elapsedTime += delta;
          if(_localCounter <= _points && _elapsedTime > 2)
          {
-//            [playSound stop];
             _physicsNode.visible = FALSE;
             _scoreLabel.visible = FALSE;
             _scoreLabelBox.visible = FALSE;
@@ -363,8 +368,6 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
 -(BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair hero:(CCNode *)hero level:(CCNode *)level {
    [gameOverSound play];
    _hero.effect = [CCEffectPixellate effectWithBlockSize: 4];
-//   _hero.effect = [CCEffectBrightness effectWithBrightness:1];
-//    [self heroRemoved:hero];
     [self gameOver];
     return TRUE;
 }
@@ -379,7 +382,15 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
 - (void)restart
 {
    [clickSound play];
-   [self presentInterlude];
+   [spinner  stopAnimating];
+   if(!_areAdsRemoved)
+   {
+      [self presentInterlude];
+   }
+   else
+   {
+      [self replaceSceneWithTransition];
+   }
 }
 
 -(void)onExit
@@ -403,8 +414,6 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
     if (!_gameOver) {
         _scrollSpeed = 0.f;
         _gameOver = TRUE;
-//        _highScoreValue.visible = TRUE;
-//        _scoreValue.visible = TRUE;
         [_hero stopAllActions];
        
 //        CCActionMoveBy *moveBy = [CCActionMoveBy actionWithDuration:0.5f position:ccp(0, 163)];
@@ -447,6 +456,7 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
 
 -(void)shareImage{
    [clickSound play];
+   [spinner  stopAnimating];
    NSString *message = [NSString stringWithFormat:@"Hey!!! I scored %ld", (long)_points];
    message = [message stringByAppendingString:@" points in Move The Dot."];
    
@@ -454,6 +464,18 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    activityVC.excludedActivityTypes = @[ UIActivityTypeAssignToContact];
    [[CCDirector sharedDirector] presentViewController:activityVC animated:YES completion:nil];
 
+}
+
+-(void)replaceSceneWithTransition
+{
+   CCScene *scene = [CCBReader loadAsScene:@"Gameplay"];
+   [[CCDirector sharedDirector] replaceScene:scene withTransition:[CCTransition transitionFadeWithDuration:1.0]];
+}
+
+-(void)replaceScene
+{
+   CCScene *scene = [CCBReader loadAsScene:@"Gameplay"];
+   [[CCDirector sharedDirector] replaceScene:scene];
 }
 
 #pragma mark GameCenter
@@ -491,6 +513,7 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
 
 -(void)showLeaderboard{
    [clickSound play];
+   [spinner  stopAnimating];
    [self showLeaderboardAndAchievements:YES];
 }
 
@@ -510,6 +533,8 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
 
 - (void)cycleInterstitial
 {
+   if(!_areAdsRemoved)
+   {
    // Clean up the old interstitial...
    interstitial.delegate = nil;
    interstitial = nil;
@@ -518,6 +543,7 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    interstitial.adUnitID = @"ca-app-pub-3129568560891761/4333608339";
    [interstitial loadRequest:[GADRequest request]];
    interstitial.delegate = self;
+   }
 }
 
 - (void)presentInterlude
@@ -527,8 +553,7 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
       [interstitial presentFromRootViewController:[CCDirector sharedDirector]];
    }
    _bannerView.hidden = YES;
-   CCScene *scene = [CCBReader loadAsScene:@"Gameplay"];
-   [[CCDirector sharedDirector] replaceScene:scene withTransition:[CCTransition transitionFadeWithDuration:1.0]];
+   [self replaceSceneWithTransition];
 }
 
 #pragma mark ADInterstitialViewDelegate methods
@@ -545,5 +570,115 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    [self cycleInterstitial];
 }
 
+#pragma mark remove ads
+
+- (void)tapsRemoveAds{
+   NSLog(@"User requests to remove ads");
+   [spinner startAnimating];
+   _scrollSpeed = 0.f;
+   if([SKPaymentQueue canMakePayments]){
+      NSLog(@"User can make payments");
+      
+      SKProductsRequest *productsRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject:kRemoveAdsProductIdentifier]];
+      productsRequest.delegate = self;
+      [productsRequest start];
+      
+   }
+   else{
+      NSLog(@"User cannot make payments due to parental controls");
+      //this is called the user cannot make payments, most likely due to parental controls
+   }
+}
+
+- (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response{
+   SKProduct *validProduct = nil;
+   int count = [response.products count];
+   if(count > 0){
+      validProduct = [response.products objectAtIndex:0];
+      NSLog(@"Products Available!");
+      [self purchase:validProduct];
+   }
+   else if(!validProduct){
+      NSLog(@"No products available");
+      //this is called if your product id is not valid, this shouldn't be called unless that happens.
+   }
+}
+
+- (void)purchase:(SKProduct *)product{
+   SKPayment *payment = [SKPayment paymentWithProduct:product];
+   [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+   [[SKPaymentQueue defaultQueue] addPayment:payment];
+}
+
+- (void) restore{
+   //this is called when the user restores purchases, you should hook this up to a button
+   [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+}
+
+- (void) paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue
+{
+   NSLog(@"received restored transactions: %lu", (unsigned long)queue.transactions.count);
+   for (SKPaymentTransaction *transaction in queue.transactions)
+   {
+      if(SKPaymentTransactionStateRestored){
+         NSLog(@"Transaction state -> Restored");
+         //called when the user successfully restores a purchase
+         [self doRemoveAds];
+         [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+         break;
+      }
+      
+   }
+   
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions{
+   for(SKPaymentTransaction *transaction in transactions){
+      switch (transaction.transactionState){
+         case SKPaymentTransactionStatePurchasing:
+         {
+            NSLog(@"Transaction state -> Purchasing");
+            //called when the user is in the process of purchasing, do not add any of your own code here.
+            break;
+         }
+         case SKPaymentTransactionStatePurchased:
+         {
+            //this is called when the user has successfully purchased the package (Cha-Ching!)
+            [self doRemoveAds]; //you can add your code for what you want to happen when the user buys the purchase here, for this tutorial we use removing ads
+            [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+            NSLog(@"Transaction state -> Purchased");
+            [spinner stopAnimating];
+            break;
+         }
+         case SKPaymentTransactionStateRestored:
+         {
+            NSLog(@"Transaction state -> Restored");
+            //add the same code as you did from SKPaymentTransactionStatePurchased here
+            [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+            [spinner stopAnimating];
+            break;
+         }
+         case SKPaymentTransactionStateFailed:
+         {
+            NSLog(@"Transaction state -> Failed");
+            //called when the transaction does not finnish
+            if(transaction.error.code != SKErrorPaymentCancelled){
+               NSLog(@"Transaction state -> Cancelled");
+               //the user cancelled the payment ;(
+            }
+            [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+            [spinner stopAnimating];
+            break;
+         }
+      }
+   }
+}
+
+- (void)doRemoveAds{
+   _areAdsRemoved = YES;
+   _bannerView.hidden = YES;
+   _removeAdsButton.visible = FALSE;
+   [[NSUserDefaults standardUserDefaults] setBool:_areAdsRemoved forKey:@"areAdsRemoved"];
+}
 
 @end
