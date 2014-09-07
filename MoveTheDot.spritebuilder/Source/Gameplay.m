@@ -15,6 +15,9 @@ static const CGFloat firstObstaclePosition = 280.f;
 static const CGFloat distanceBetweenObstacles = 200.f;
 
 #define kRemoveAdsProductIdentifier @"com.bakwasgames.movethedot.removeads"
+#define SYSTEM_VERSION_LESS_THAN(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
+#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
+
 
 // fixing the drawing order. forcing the ground to be drawn above the pipes.
 typedef NS_ENUM(NSInteger, DrawingOrder) {
@@ -55,6 +58,7 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    GADInterstitial *interstitial;
    CCButton *_removeAdsButton;
    UIActivityIndicatorView *spinner;
+   NSString *osVersion;
 }
 
 // is called when CCB file has completed loading
@@ -393,6 +397,17 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    }
 }
 
+-(void)pause
+{
+   if([CCDirector sharedDirector].isPaused)
+   {
+      [[CCDirector sharedDirector] resume];
+   }
+   else{
+   [[CCDirector sharedDirector] pause];
+   }
+}
+
 -(void)onExit
 {
     [self stopAllActions];
@@ -429,8 +444,10 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
         {
         
             [[NSUserDefaults standardUserDefaults] setInteger: _points forKey: @"highScore"];
-
+           if(SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7.0"))
+           {
            [self reportScore];
+           }
         
         }
         _highScore = [[NSUserDefaults standardUserDefaults] integerForKey:@"highScore"] ;
@@ -439,8 +456,13 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
        // Take Screen Shot
        UIGraphicsBeginImageContextWithOptions([CCDirector sharedDirector].view.bounds.size, NO, [UIScreen mainScreen].scale);
        
-       [[CCDirector sharedDirector].view drawViewHierarchyInRect:[CCDirector sharedDirector].view.bounds afterScreenUpdates:NO];
-       
+//       [[CCDirector sharedDirector].view drawViewHierarchyInRect:[CCDirector sharedDirector].view.bounds afterScreenUpdates:NO];
+       /* iOS 7 */
+       if(SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7.0"))
+          [[CCDirector sharedDirector].view drawViewHierarchyInRect:[CCDirector sharedDirector].view.bounds afterScreenUpdates:NO];
+       else /* iOS 6 */
+          [[CCDirector sharedDirector].view.layer renderInContext:UIGraphicsGetCurrentContext()];
+
        _image = UIGraphicsGetImageFromCurrentImageContext();
        UIGraphicsEndImageContext();
        
@@ -459,6 +481,7 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    [spinner  stopAnimating];
    NSString *message = [NSString stringWithFormat:@"Hey!!! I scored %ld", (long)_points];
    message = [message stringByAppendingString:@" points in Move The Dot."];
+   message = [message stringByAppendingString:@" Check it out https://itunes.apple.com/app/id914300555"];
    
    UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:[NSArray arrayWithObjects:message,_image, nil] applicationActivities:nil];
    activityVC.excludedActivityTypes = @[ UIActivityTypeAssignToContact];
@@ -480,6 +503,8 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
 
 #pragma mark GameCenter
 -(void)reportScore{
+   if(SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7.0"))
+   {
    GKScore *score = [[GKScore alloc] initWithLeaderboardIdentifier:@"2"];
    score.value = _points;
    
@@ -488,6 +513,7 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
          NSLog(@"%@", [error localizedDescription]);
       }
    }];
+   }
 }
 
 -(void)showLeaderboardAndAchievements:(BOOL)shouldShowLeaderboard{
@@ -512,9 +538,12 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
 }
 
 -(void)showLeaderboard{
+   if(SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7.0"))
+   {
    [clickSound play];
    [spinner  stopAnimating];
    [self showLeaderboardAndAchievements:YES];
+   }
 }
 
 #pragma mark GADBannerViewDelegate implementation

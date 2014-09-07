@@ -13,7 +13,7 @@
 		3AB72AB919A6AB89004CBD9E /* Goal.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AB72AB819A6AB89004CBD9E /* Goal.m */; };
 		3AB72AC119AF4109004CBD9E /* soothing.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3AB72AC019AF4109004CBD9E /* soothing.wav */; };
 		3AB72AC319B00A2C004CBD9E /* game_over.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3AB72AC219B00A2C004CBD9E /* game_over.wav */; };
-		3AB72AC719B2C815004CBD9E /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AB72AC619B2C815004CBD9E /* GameController.framework */; };
+		3AB72AC719B2C815004CBD9E /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AB72AC619B2C815004CBD9E /* GameController.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		3AB72AC919B2C829004CBD9E /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AB72AC819B2C829004CBD9E /* GameKit.framework */; };
 		3AB943C819B482130071FFFD /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AB943C719B482130071FFFD /* StoreKit.framework */; };
 		3AB943EF19B485B20071FFFD /* libGoogleAdMobAds.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AB943ED19B485B20071FFFD /* libGoogleAdMobAds.a */; };
