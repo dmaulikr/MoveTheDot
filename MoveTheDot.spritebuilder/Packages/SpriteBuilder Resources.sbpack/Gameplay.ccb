@@ -10,7 +10,7 @@
 		<false/>
 	</dict>
 	<key>UUID</key>
-	<integer>30</integer>
+	<integer>33</integer>
 	<key>centeredOrigin</key>
 	<false/>
 	<key>currentResolution</key>
@@ -3311,6 +3311,14 @@
 							</dict>
 							<dict>
 								<key>name</key>
+								<string>togglesSelectedState</string>
+								<key>type</key>
+								<string>Check</string>
+								<key>value</key>
+								<true/>
+							</dict>
+							<dict>
+								<key>name</key>
 								<string>backgroundSpriteFrame|Normal</string>
 								<key>type</key>
 								<string>SpriteFrame</string>
@@ -3371,7 +3379,7 @@
 								<key>value</key>
 								<array>
 									<string></string>
-									<string>GameScene/removeadsbutton.png</string>
+									<string>GameScene/purchasingwaitbutton.png</string>
 								</array>
 							</dict>
 							<dict>
@@ -3515,6 +3523,8 @@
 								</array>
 							</dict>
 						</array>
+						<key>selected</key>
+						<true/>
 					</dict>
 				</array>
 				<key>customClass</key>

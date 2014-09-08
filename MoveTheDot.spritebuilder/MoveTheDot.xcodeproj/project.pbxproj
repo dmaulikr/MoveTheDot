@@ -15,6 +15,7 @@
 		3AB72AC319B00A2C004CBD9E /* game_over.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3AB72AC219B00A2C004CBD9E /* game_over.wav */; };
 		3AB72AC719B2C815004CBD9E /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AB72AC619B2C815004CBD9E /* GameController.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		3AB72AC919B2C829004CBD9E /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AB72AC819B2C829004CBD9E /* GameKit.framework */; };
+		3AB90E5519BCEA21008F880B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3AB90E5419BCEA21008F880B /* Images.xcassets */; };
 		3AB943C819B482130071FFFD /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AB943C719B482130071FFFD /* StoreKit.framework */; };
 		3AB943EF19B485B20071FFFD /* libGoogleAdMobAds.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AB943ED19B485B20071FFFD /* libGoogleAdMobAds.a */; };
 		3AB943F019B485B20071FFFD /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3AB943EE19B485B20071FFFD /* README.txt */; };
@@ -81,6 +82,7 @@
 		3AB72AC219B00A2C004CBD9E /* game_over.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = game_over.wav; sourceTree = "<group>"; };
 		3AB72AC619B2C815004CBD9E /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
 		3AB72AC819B2C829004CBD9E /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
+		3AB90E5419BCEA21008F880B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = MoveTheDot/Images.xcassets; sourceTree = SOURCE_ROOT; };
 		3AB943C719B482130071FFFD /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3AB943D019B485B20071FFFD /* DFPBannerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPBannerView.h; sourceTree = "<group>"; };
 		3AB943D119B485B20071FFFD /* DFPExtras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPExtras.h; sourceTree = "<group>"; };
@@ -356,6 +358,7 @@
 		B77F1B4617B978D7009739AE /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				3AB90E5419BCEA21008F880B /* Images.xcassets */,
 				3AB72AC219B00A2C004CBD9E /* game_over.wav */,
 				3AB72AC019AF4109004CBD9E /* soothing.wav */,
 				3AB72AB419A59783004CBD9E /* click.wav */,
@@ -455,6 +458,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B71F5919188484E7003F4D28 /* Settings.png in Resources */,
+				3AB90E5519BCEA21008F880B /* Images.xcassets in Resources */,
 				B7378978180762440076A88C /* Default@2x.png in Resources */,
 				3AB72AC319B00A2C004CBD9E /* game_over.wav in Resources */,
 				B71F5914188484E7003F4D28 /* iPad@2x.png in Resources */,
@@ -582,6 +586,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -619,6 +625,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
