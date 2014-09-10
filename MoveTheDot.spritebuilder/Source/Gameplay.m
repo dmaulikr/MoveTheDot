@@ -9,7 +9,7 @@
 #import "Gameplay.h"
 #import "Obstacle.h"
 
-static const CGFloat scrollSpeedRate = 200.f;
+static const CGFloat scrollSpeedRate = 250.f;
 static const CGFloat yAccelSpeed = 10.f;
 static const CGFloat firstObstaclePosition = 280.f;
 static const CGFloat distanceBetweenObstacles = 200.f;
