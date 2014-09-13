@@ -1,7 +1,7 @@
 {
   "configuration_format_version": 2,
 
-   "default_target": {"project": "fastfingers", "project_config": "Release", "target": "fastfingers"},
+   "default_target": {"project": “MoveTheDot”, "project_config": "Release", "target": “MoveTheDot”},
 
 
   // Dictionary of global configuration parameters.
