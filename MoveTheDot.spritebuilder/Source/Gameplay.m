@@ -641,6 +641,8 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
 
 - (void) restore{
    //this is called when the user restores purchases, you should hook this up to a button
+   [spinner startAnimating];
+   [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
 }
 
