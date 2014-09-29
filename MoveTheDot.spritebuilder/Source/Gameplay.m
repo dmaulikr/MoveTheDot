@@ -138,7 +138,7 @@ typedef NS_ENUM(NSInteger, DrawingOrder) {
    // Initialize the banner at the bottom of the screen.
    CGPoint origin = CGPointMake(0.0,
                                 [CCDirector sharedDirector].view.frame.size.height -
-                                CGSizeFromGADAdSize(kGADAdSizeBanner).height);
+                                CGSizeFromGADAdSize(kGADAdSizeSmartBannerPortrait).height);
    _bannerView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeSmartBannerPortrait origin:origin];
    
    // Specify the ad unit ID.
